@@ -26,6 +26,7 @@ import (
 	"io"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -267,6 +268,17 @@ func (d *Decoder) next(out *Message) (err error) {
 		}
 
 		return
+	default:
+		// inline request
+		arr := strings.Split(strings.Trim(string(d.lastLine), "\r\n"), " ")
+		arrLen := len(arr)
+
+		out.Array = make([]*Message, arrLen)
+		for i := 0; i < arrLen; i++ {
+			out.Array[i] = new(Message)
+			out.Array[i].Bytes = []byte(arr[i])
+		}
+		return nil
 	}
 
 	return ErrInvalidInput

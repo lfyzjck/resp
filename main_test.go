@@ -238,6 +238,40 @@ func TestArrayDecode(t *testing.T) {
 	}
 }
 
+func TestInlineRequestDecode(t *testing.T) {
+	var test Message
+	var err error
+
+	// simple `PING` request
+	if err = Unmarshal([]byte("PING\r\n"), &test); err != nil {
+		t.Fatal(err)
+	}
+
+	if len(test.Array) != 1 {
+		t.Fatal(errTestFailed)
+	}
+
+	if string(test.Array[0].Bytes) != "PING" {
+		t.Fatal(errTestFailed)
+	}
+
+	// exists
+	if err = Unmarshal([]byte("EXISTS somekey\r\n"), &test); err != nil {
+		t.Fatal(err)
+	}
+
+	if len(test.Array) != 2 {
+		t.Fatal(errTestFailed)
+	}
+
+	if string(test.Array[0].Bytes) != "EXISTS" {
+		t.Fatal(errTestFailed)
+	}
+	if string(test.Array[1].Bytes) != "somekey" {
+		t.Fatal(errTestFailed)
+	}
+}
+
 func TestArrayDecodeTwoElements(t *testing.T) {
 	var test Message
 	var err error
